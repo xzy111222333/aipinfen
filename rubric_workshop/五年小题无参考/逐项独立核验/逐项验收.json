@@ -1,0 +1,131 @@
+[
+  {
+    "key": "2023地市-1",
+    "first": "原稿",
+    "second": "等义转述",
+    "expected": "equal",
+    "targets": [],
+    "changes": {},
+    "passed": true
+  },
+  {
+    "key": "2023地市-1",
+    "first": "原稿",
+    "second": "删融资",
+    "expected": "remove",
+    "targets": [
+      "GEP贷质押融资"
+    ],
+    "changes": {
+      "GEP贷质押融资": 2.0
+    },
+    "passed": true
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷2",
+    "second": "答卷3",
+    "expected": "equal",
+    "targets": [],
+    "changes": {
+      "人地长期适应与生态链": -0.5
+    },
+    "passed": false
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷2",
+    "second": "答卷4",
+    "expected": "zero",
+    "targets": [
+      "老藤固碳"
+    ],
+    "changes": {
+      "漏斗架防风固土保水": -0.5,
+      "老藤固碳": 1.0,
+      "修剪凋落物还田培肥": 1.0
+    },
+    "passed": true
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷1",
+    "second": "删文旅",
+    "expected": "equal",
+    "targets": [],
+    "changes": {
+      "老藤固碳": -0.5
+    },
+    "passed": false
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷1",
+    "second": "删储碳",
+    "expected": "remove",
+    "targets": [
+      "修剪凋落物还田培肥",
+      "老藤固碳"
+    ],
+    "changes": {
+      "老藤固碳": 0.5,
+      "修剪凋落物还田培肥": 0.5
+    },
+    "passed": true
+  },
+  {
+    "key": "2026地市-3",
+    "first": "答卷3",
+    "second": "答卷4",
+    "expected": "equal",
+    "targets": [],
+    "changes": {
+      "报名对象与门槛": 1.0,
+      "报名号召": -1.0
+    },
+    "passed": false
+  },
+  {
+    "key": "2026地市-3",
+    "first": "答卷3",
+    "second": "答卷5",
+    "expected": "zero",
+    "targets": [
+      "参与流程"
+    ],
+    "changes": {
+      "公众科学模式": 1.0,
+      "报名号召": -1.0,
+      "发布词体式与结构": -1.0,
+      "整体沟通效果": -1.5
+    },
+    "passed": false
+  },
+  {
+    "key": "2026地市-3",
+    "first": "答卷2",
+    "second": "删培训形式",
+    "expected": "equal",
+    "targets": [],
+    "changes": {},
+    "passed": true
+  },
+  {
+    "key": "2022地市-1",
+    "first": "白鹭1",
+    "second": "删第三案例",
+    "expected": "remove",
+    "targets": [
+      "动车所工业游—互动体验",
+      "动车所工业游—开放资源发展研学",
+      "动车所工业游—铁路发展史科普教育"
+    ],
+    "changes": {
+      "月明湖服务区—智慧便捷服务": 0.5,
+      "动车所工业游—开放资源发展研学": 1.0,
+      "动车所工业游—互动体验": 1.0,
+      "动车所工业游—铁路发展史科普教育": 0.5
+    },
+    "passed": false
+  }
+]

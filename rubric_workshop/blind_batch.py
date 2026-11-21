@@ -683,6 +683,9 @@ def allowed_scores(items):
     raise ValueError("无法从细则提取完整的合法分值")
 
 def evaluate(src,r,answer,scales=None):
+    if r.get("isolated_items"):
+        from rubric_workshop.isolated_items import grade
+        return grade(src,r,answer)
     if r.get("aspect_levels"):
         return evaluate_aspects(src,r,answer)
     if all("units" in i for i in r["items"]):

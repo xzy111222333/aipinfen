@@ -341,7 +341,9 @@ def main():
     mark.add_argument("answer", type=Path)
     blind = commands.add_parser('make-blind', help='只用题目和指定材料制作小题细则')
     blind.add_argument('key', help='五年题库中的题号')
-    blind.add_argument('--independent-tasks', action='store_true', help='冻结前检验细节是否独立回答题意')
+    methods = blind.add_mutually_exclusive_group()
+    methods.add_argument('--isolated-items', action='store_true', help='按题干确定独立判据并逐项复评')
+    methods.add_argument('--independent-tasks', action='store_true', help='冻结前检验细节是否独立回答题意')
     blind.add_argument('--output', type=Path, required=True)
     trial = commands.add_parser('grade-blind', help='按无机构答案细则逐项试评')
     trial.add_argument('rubric', type=Path)
@@ -355,9 +357,13 @@ def main():
         target=args.output/args.key/'细则.json'
         if target.exists():
             existing=load(target)
-            require(existing['source']==entry and existing['rubric'].get('compact_minimum') and bool(existing['rubric'].get('independent_tasks')) == args.independent_tasks, '输出位置已有另一版本细则')
+            require(existing['source']==entry and (bool(existing['rubric'].get('isolated_items')) == args.isolated_items) and (args.isolated_items or existing['rubric'].get('compact_minimum')) and bool(existing['rubric'].get('independent_tasks')) == args.independent_tasks, '输出位置已有另一版本细则')
         else:
-            rubric = build_blind(entry,target.parent)
+            if args.isolated_items:
+                from rubric_workshop.isolated_items import build as build_isolated
+                rubric = build_isolated(entry)
+            else:
+                rubric = build_blind(entry,target.parent)
             if args.independent_tasks:
                 from rubric_workshop.semantic_rubric import review_independent_tasks
                 rubric = review_independent_tasks(entry,rubric)

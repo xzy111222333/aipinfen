@@ -1,0 +1,135 @@
+[
+  {
+    "key": "2023地市-1",
+    "first": "原稿",
+    "second": "等义转述",
+    "expected": "equal",
+    "targets": [],
+    "changes": {},
+    "passed": true
+  },
+  {
+    "key": "2023地市-1",
+    "first": "原稿",
+    "second": "删融资",
+    "expected": "remove",
+    "targets": [
+      "GEP贷质押融资"
+    ],
+    "changes": {
+      "GEP贷质押融资": 2.0,
+      "湿地碳汇市场交易": 2.0
+    },
+    "passed": false
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷2",
+    "second": "答卷3",
+    "expected": "equal",
+    "targets": [],
+    "changes": {},
+    "passed": true
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷2",
+    "second": "答卷4",
+    "expected": "zero",
+    "targets": [
+      "固碳增汇"
+    ],
+    "changes": {
+      "防灾护土": -2.0,
+      "绿色环保": 1.0,
+      "固碳增汇": 1.0
+    },
+    "passed": true
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷1",
+    "second": "删文旅",
+    "expected": "equal",
+    "targets": [],
+    "changes": {},
+    "passed": true
+  },
+  {
+    "key": "2025地市-1",
+    "first": "答卷1",
+    "second": "删储碳",
+    "expected": "remove",
+    "targets": [
+      "固碳增汇"
+    ],
+    "changes": {
+      "固碳增汇": 1.0
+    },
+    "passed": true
+  },
+  {
+    "key": "2026地市-3",
+    "first": "答卷3",
+    "second": "答卷4",
+    "expected": "equal",
+    "targets": [],
+    "changes": {
+      "参与对象与角色": 1.0,
+      "报名方式与邀请": -1.0
+    },
+    "passed": false
+  },
+  {
+    "key": "2026地市-3",
+    "first": "答卷3",
+    "second": "答卷5",
+    "expected": "zero",
+    "targets": [
+      "公众参与任务"
+    ],
+    "changes": {
+      "公众参与任务": 2.0,
+      "语言号召力": -1.0
+    },
+    "passed": true
+  },
+  {
+    "key": "2026地市-3",
+    "first": "答卷2",
+    "second": "删培训形式",
+    "expected": "equal",
+    "targets": [],
+    "changes": {},
+    "passed": true
+  },
+  {
+    "key": "2022地市-1",
+    "first": "白鹭1",
+    "second": "删第三案例",
+    "expected": "remove",
+    "targets": [
+      "动车所工业游",
+      "动车所科普教育"
+    ],
+    "changes": {
+      "服务区智慧服务": 0.5,
+      "列车线路串联": -0.5,
+      "列车民族文化": -0.5,
+      "列车多元服务": 0.5,
+      "动车所工业游": 2.0,
+      "动车所科普教育": 0.5,
+      "共同开发品牌目的地": -0.5
+    },
+    "passed": false
+  },
+  {
+    "key": "2024副省-2",
+    "first": "盲写原稿",
+    "second": "原段倒序",
+    "expected": "equal",
+    "targets": [],
+    "changes": {},
+    "passed": true
+  }
+]
