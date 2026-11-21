@@ -683,6 +683,9 @@ def allowed_scores(items):
     raise ValueError("无法从细则提取完整的合法分值")
 
 def evaluate(src,r,answer,scales=None):
+    if r.get("binary_units"):
+        from rubric_workshop.task_evidence import grade_units
+        return grade_units(src,r,answer)
     if r.get("isolated_items"):
         from rubric_workshop.isolated_items import grade
         return grade(src,r,answer)

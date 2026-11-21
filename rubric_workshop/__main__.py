@@ -344,6 +344,8 @@ def main():
     methods = blind.add_mutually_exclusive_group()
     methods.add_argument('--isolated-items', action='store_true', help='按题干确定独立判据并逐项复评')
     methods.add_argument('--independent-tasks', action='store_true', help='冻结前检验细节是否独立回答题意')
+    methods.add_argument('--task-evidence', action='store_true', help='分配分值前核查每项独立意义和材料依据')
+    blind.add_argument('--quantize', action='store_true', help='在任务证据实验中将独立语义转换为固定分值')
     blind.add_argument('--output', type=Path, required=True)
     trial = commands.add_parser('grade-blind', help='按无机构答案细则逐项试评')
     trial.add_argument('rubric', type=Path)
@@ -353,13 +355,21 @@ def main():
         from rubric_workshop.blind_batch import catalog, load, save
         from rubric_workshop.semantic_rubric import build as build_blind
         entry = next((src for key,_,src in catalog() if key == args.key), None)
-        require(entry is not None and entry['type'] in (1,2), '题号无效或不是小题')
+        require(entry is not None and (entry['type'] in (1,2) or args.task_evidence), '题号无效或不是小题')
+        require(not args.quantize or args.task_evidence, '--quantize 需与 --task-evidence 一起使用')
         target=args.output/args.key/'细则.json'
         if target.exists():
             existing=load(target)
-            require(existing['source']==entry and (bool(existing['rubric'].get('isolated_items')) == args.isolated_items) and (args.isolated_items or existing['rubric'].get('compact_minimum')) and bool(existing['rubric'].get('independent_tasks')) == args.independent_tasks, '输出位置已有另一版本细则')
+            require(bool(existing['rubric'].get('binary_units')) == (args.quantize and entry['type'] != 3) and existing['source']==entry and (bool(existing['rubric'].get('isolated_items')) == args.isolated_items) and bool(existing['rubric'].get('task_evidence')) == args.task_evidence and (args.task_evidence or args.isolated_items or existing['rubric'].get('compact_minimum')) and bool(existing['rubric'].get('independent_tasks')) == args.independent_tasks, '输出位置已有另一版本细则')
         else:
-            if args.isolated_items:
+            if args.task_evidence:
+                from rubric_workshop.task_evidence import build
+                rubric = build(entry, target.parent)
+                if args.quantize:
+                    from rubric_workshop.task_evidence import compile_units
+                    save(target.parent/'给分草案.json', rubric)
+                    rubric = compile_units(entry, rubric)
+            elif args.isolated_items:
                 from rubric_workshop.isolated_items import build as build_isolated
                 rubric = build_isolated(entry)
             else:
