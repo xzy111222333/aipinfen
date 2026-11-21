@@ -1,0 +1,105 @@
+{
+  "answer": "坚持系统思维，凝聚各方合力，切实提升工作质效，推动高质量发展。",
+  "chars": 31,
+  "marks": [
+    {
+      "name": "核算与应用",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及GEP核算方法或核算结果应用",
+      "decisions": [
+        {
+          "condition": "制定核算方法并推动结果应用",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "项目开发",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及依据核算报告识别资源并开发项目",
+      "decisions": [
+        {
+          "condition": "依核算报告识别资源并开发项目",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "公司主体",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及组建生态强村公司及其转化交易职能",
+      "decisions": [
+        {
+          "condition": "组建生态强村公司承担转化交易",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "GEP贷融资",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及GEP贷、经营权质押或融资",
+      "decisions": [
+        {
+          "condition": "创新GEP贷并以经营权质押融资",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "引企转化",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及依据GEP报告强优补短招引企业",
+      "decisions": [
+        {
+          "condition": "依报告强优补短引环境敏感企业",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "要素分配",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及生态价值作为要素参与合作利润分配",
+      "decisions": [
+        {
+          "condition": "生态价值作要素参与合作利润分配",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "碳汇交易",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及GEP核算用于湿地碳汇交易",
+      "decisions": [
+        {
+          "condition": "将GEP核算用于湿地碳汇交易",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    }
+  ],
+  "score": 0.0
+}

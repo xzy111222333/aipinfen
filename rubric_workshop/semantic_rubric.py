@@ -129,3 +129,42 @@ def compact_minimum(source, rubric):
                 raise
             payload['校正']=str(exc)
 
+
+def review_independent_tasks(source, rubric):
+    """分区内合并回答同一问的证据，保留原分区预算及组织规则。"""
+    candidates = {str(n): item for n,item in enumerate(rubric['items'],1) if item['zone']=='内容'}
+    payload = dict(题面=source['question'], 原材料=source['materials'], 草案={k:[i['name'],i['claim']] for k,i in candidates.items()})
+    prompt = """在冻结前确定哪些意思可以独立占分。输入只含原题、材料及候选内容。每项先做删除检验：考生已交代上位关系，省掉一个动作、例子或解释后，针对题干究竟少回答了什么？无法指出独立缺口，就并入同一任务作等价例证，不设必答门槛。明问各案例各自特点时保留各对象，明问过程、机制或读者行动时保留必要环节。每组只有一个核心判断，名称、两条满分表达、部分、零分要在同一层级。概括与具体写法均可独立成立。不得把一个关系写成多层条件的合取。每个输入编号恰一次。输出 {"groups":[[["1","2"],"组名","删除整个组具体漏答的题意","直接概括充分答句","另一充分表达","部分答句","近错答句","可省细节"]]}。"""
+    limit=int(re.search(r'不超过\s*(\d+)\s*字',source['question'])[1])
+    payload['全题内容短答格数上限'] = limit
+    prompt += '每个直接概括只写一个短句，不复述证据，全部概括合计留出排版余量。不同对象、不同功能不可因同属一个大类而合并。请严格输出合法JSON。'
+    for attempt in range(3):
+        try:
+            groups = call_llm_json(prompt,payload)['groups']
+            revised = []
+            covered = set()
+            for ids,name,loss,claim,alternative,partial,reject,optional in groups:
+                if not isinstance(ids,list) or not ids or not all(type(i) in (int,str) for i in ids):
+                    raise ValueError(f'每组首字段必须是编号数组，合法编号为{list(candidates)}')
+                ids = [str(i) for i in ids]
+                if len(set(ids)) != len(ids) or set(ids)&covered or not set(ids)<=set(candidates):
+                    raise ValueError(f'本组编号{ids}重复或无效，已归组{sorted(covered)}，合法编号{list(candidates)}')
+                if not all(isinstance(v,str) and v.strip() for v in (name,loss,claim,alternative,partial,reject,optional)):
+                    raise ValueError('每个方面须有删除检验和完整分档')
+                covered.update(ids)
+                evidence = {k:v for i in ids for k,v in candidates[i]['evidence'].items()}
+                revised.append(dict(zone='内容',name=name,claim=claim,alternative=alternative,partial=partial,reject=reject,optional=optional,boundary=loss,evidence=evidence,source_items=[candidates[i]['name'] for i in ids],points=sum(candidates[i]['points'] for i in ids)))
+            if covered!=set(candidates):
+                raise ValueError('存在遗漏的候选方面')
+            size=count_pure_exam_chars('。'.join(i['claim'] for i in revised))
+            limit=int(re.search(r'不超过\s*(\d+)\s*字',source['question'])[1])
+            if size>limit:
+                raise ValueError(f'内容短答{size}格，超过{limit}格')
+            revised.extend(i for i in rubric['items'] if i['zone']!='内容')
+            if len(set(i['name'] for i in revised))!=len(revised):
+                raise ValueError('评分项名称重复')
+            return dict(rubric,items=revised,content_chars=size,independent_tasks=True)
+        except (ValueError,TypeError,KeyError) as exc:
+            if attempt==2:
+                raise
+            payload['校正']=str(exc)

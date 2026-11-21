@@ -624,6 +624,8 @@ def evaluate_aspects(src,r,answer):
         spans=re.findall(r'[^。！？；\n]+[。！？；]?|[。！？；]',answer)
         payload['答卷']={str(n):text for n,text in enumerate(spans,1)}
         prompt += '本次证据改用编号数组，返回每项[档位,答卷原句编号数组,理由]。优先比对最低充分意思或等价意思，部分答到时对照部分档。核对上下文中的事实矛盾，包括把单次情形改成固定规定；涉及矛盾的方面不能判满分。'
+    if r.get('independent_tasks'):
+        prompt += '键须逐一返回：' + '、'.join(keys) + '。判据只写一句，不在JSON字符串中使用英文双引号引用答卷，证据仅列句号编号。'
     for attempt in range(3):
         try:
             levels=call_llm_json(prompt,payload)["levels"]

@@ -9,6 +9,22 @@ class BlindBatchTests(unittest.TestCase):
     def setUpClass(cls):
         cls.entries=list(catalog())
 
+    def test_independent_groups_conserve_points_and_organization(self):
+        from rubric_workshop.semantic_rubric import review_independent_tasks
+        source = dict(question='不超过20字', materials={'1':'共同完成任务'})
+        content = dict(zone='内容', claim='合作', evidence={'1':'共同完成任务'})
+        organization = dict(zone='组织', name='条理', points=1)
+        rubric = dict(items=[dict(content,name='甲',points=1.25),dict(content,name='乙',points=1.75),organization])
+        row = [[1,2],'配合','缺合作关系','双方合作','甲协助乙','仅有一方','各自为政','时间']
+        with patch('rubric_workshop.semantic_rubric.call_llm_json',return_value={'groups':[row]}):
+            result = review_independent_tasks(source,rubric)
+        self.assertEqual([i['points'] for i in result['items']],[3,1])
+        self.assertEqual(result['items'][1],organization)
+        row[0] = [1,1]
+        with patch('rubric_workshop.semantic_rubric.call_llm_json',return_value={'groups':[row]}):
+            with self.assertRaises(ValueError):
+                review_independent_tasks(source,rubric)
+
     def test_paper_coverage(self):
         self.assertEqual(len(self.entries),61)
         self.assertEqual(len({p.parent for _,p,_ in self.entries}),15)

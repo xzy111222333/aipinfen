@@ -31,3 +31,5 @@ Markdown 是阅卷人可阅读的细则，JSON 同时记录题干材料、参考
 每轮修改制标或判分前先读[小题制标原则与回测](小题制标原则与回测.md)。从根目录运行 `python -m rubric_workshop.joint_replay --output rubric_workshop/五年小题无参考/联合验收` 可继续该轮验收；变更规则时换用新目录，保留前一轮冻结细则和答卷结果。对照检查同时保存各项分差，须复核是否误扣无关项。
 
 实验入口 `python -m rubric_workshop make-blind 2025地市-1 --output 本轮细则` 按题号生成只用题面和材料的细则。`python -m rubric_workshop grade-blind 本轮细则/2025地市-1/细则.json 答卷.txt` 逐项返回原句、判据和分数。`python -m rubric_workshop.check_full_credit --semantic --samples-only` 回放六题八稿及删改对照。
+
+删除检验实验在 make-blind 后加 `--independent-tasks`，使用新的输出目录。运行 `python -m rubric_workshop.check_independent_tasks` 回放开发题及本轮留出卷，逐项检查删改是否误伤其他内容。

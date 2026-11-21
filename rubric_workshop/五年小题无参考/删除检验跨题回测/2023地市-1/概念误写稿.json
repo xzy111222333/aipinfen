@@ -1,0 +1,105 @@
+{
+  "answer": "把生态产品总值当作当年企业营业收入，直接给企业分红。",
+  "chars": 26,
+  "marks": [
+    {
+      "name": "核算与应用",
+      "score": 0.0,
+      "quote": "",
+      "why": "未涉及制定核算方法及推动结果应用",
+      "decisions": [
+        {
+          "condition": "制定核算方法并推动结果应用",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "项目开发",
+      "score": 0.0,
+      "quote": "",
+      "why": "未涉及依据GEP核算报告识别资源、开发项目",
+      "decisions": [
+        {
+          "condition": "依核算报告识别资源并开发项目",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "公司主体",
+      "score": 0.0,
+      "quote": "",
+      "why": "未涉及组建生态强村公司及其转化交易职能",
+      "decisions": [
+        {
+          "condition": "组建生态强村公司承担转化交易",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "GEP贷融资",
+      "score": 0.0,
+      "quote": "",
+      "why": "未涉及GEP贷、经营权质押或融资",
+      "decisions": [
+        {
+          "condition": "创新GEP贷并以经营权质押融资",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "引企转化",
+      "score": 0.0,
+      "quote": "",
+      "why": "未涉及依据GEP报告强优补短、招引环境敏感企业",
+      "decisions": [
+        {
+          "condition": "依报告强优补短引环境敏感企业",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "要素分配",
+      "score": 0.0,
+      "quote": "",
+      "why": "将生态产品总值错误比作企业营业收入并直接分红，未表达生态价值作为要素参与合作利润分配",
+      "decisions": [
+        {
+          "condition": "生态价值作要素参与合作利润分配",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "碳汇交易",
+      "score": 0.0,
+      "quote": "",
+      "why": "未涉及将GEP核算用于湿地碳汇交易",
+      "decisions": [
+        {
+          "condition": "将GEP核算用于湿地碳汇交易",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    }
+  ],
+  "score": 0.0
+}

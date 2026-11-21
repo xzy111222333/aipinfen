@@ -37,3 +37,5 @@
 - `rubric_workshop/blind_report.py` 汇总逐题分数和低分诊断，输出可查阅的结果索引。
 
 - `rubric_workshop/semantic_rubric.py` 从题目与材料生成逐段事实、方面草案，复核可省略细节和最低充分表达，冻结后交给 `blind_batch.evaluate_aspects` 按原句评分。
+
+- `rubric_workshop/check_independent_tasks.py` 从相同题源细则检验内容是否应独立计分，保留预算，冻结后用旧卷与留出卷核对逐项变化。
