@@ -29,3 +29,5 @@ Markdown 是阅卷人可阅读的细则，JSON 同时记录题干材料、参考
 初制只发送题目、作答要求、指定材料和既定类别预算。段号、证据引文、各类分值合计及满分边界由程序核对；独立复核对照题干材料提出实质问题和边界样例，修订或标记待复核。冻结后才提取署名白鹭的答卷试评，排除明确标为第三方改进的版本，保存细则文件摘要和逐项答卷证据。低于满分60%的版本逐一审查，诊断不回写细则。各版白鹭答案均无官方得分。试评不充当绝对分校准。
 
 每轮修改制标或判分前先读[小题制标原则与回测](小题制标原则与回测.md)。从根目录运行 `python -m rubric_workshop.joint_replay --output rubric_workshop/五年小题无参考/联合验收` 可继续该轮验收；变更规则时换用新目录，保留前一轮冻结细则和答卷结果。对照检查同时保存各项分差，须复核是否误扣无关项。
+
+实验入口 `python -m rubric_workshop make-blind 2025地市-1 --output 本轮细则` 按题号生成只用题面和材料的细则。`python -m rubric_workshop grade-blind 本轮细则/2025地市-1/细则.json 答卷.txt` 逐项返回原句、判据和分数。`python -m rubric_workshop.check_full_credit --semantic --samples-only` 回放六题八稿及删改对照。

@@ -1,0 +1,73 @@
+[
+  {
+    "name": "葡萄园储碳转述",
+    "left": 2.0,
+    "right": 2.0,
+    "numeric_pass": true,
+    "changes": {},
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "葡萄园保土与储碳",
+    "left": 2.0,
+    "right": 0,
+    "numeric_pass": true,
+    "changes": {
+      "绿色种植与储碳": 2.0
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "葡萄园删储碳",
+    "left": 8.5,
+    "right": 7.5,
+    "numeric_pass": true,
+    "changes": {
+      "庭园小气候与空间利用": 0.5,
+      "绿色种植与储碳": 0.5
+    },
+    "retained_evidence_to_review": [
+      {
+        "item": "庭园小气候与空间利用",
+        "condition": "架下种植喜阴植物或其他明确的复合种植",
+        "quote": "利用小环境气候种植喜阴植物"
+      }
+    ]
+  },
+  {
+    "name": "发布词流程转述",
+    "left": 4.0,
+    "right": 4.0,
+    "numeric_pass": true,
+    "changes": {},
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "发布词删流程",
+    "left": 4.0,
+    "right": 0,
+    "numeric_pass": true,
+    "changes": {
+      "模式和参与对象": 1,
+      "参与路径": 3.0
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "发布词删报名指引",
+    "left": 20.0,
+    "right": 15.5,
+    "numeric_pass": true,
+    "changes": {
+      "参与路径": 3.5,
+      "发布与阅读顺序": 1
+    },
+    "retained_evidence_to_review": [
+      {
+        "item": "发布与阅读顺序",
+        "condition": "内容分层，能顺畅找到项目介绍与参与方式；不限定顺序",
+        "quote": "项目采用“专业科研+公众参与”模式"
+      }
+    ]
+  }
+]

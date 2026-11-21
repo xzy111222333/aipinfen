@@ -339,7 +339,33 @@ def main():
     mark = commands.add_parser("grade")
     mark.add_argument("rubric", type=Path)
     mark.add_argument("answer", type=Path)
+    blind = commands.add_parser('make-blind', help='只用题目和指定材料制作小题细则')
+    blind.add_argument('key', help='五年题库中的题号')
+    blind.add_argument('--output', type=Path, required=True)
+    trial = commands.add_parser('grade-blind', help='按无机构答案细则逐项试评')
+    trial.add_argument('rubric', type=Path)
+    trial.add_argument('answer', type=Path)
     args = parser.parse_args()
+    if args.command == 'make-blind':
+        from rubric_workshop.blind_batch import catalog, load, save
+        from rubric_workshop.semantic_rubric import build as build_blind
+        entry = next((src for key,_,src in catalog() if key == args.key), None)
+        require(entry is not None and entry['type'] in (1,2), '题号无效或不是小题')
+        target=args.output/args.key/'细则.json'
+        if target.exists():
+            existing=load(target)
+            require(existing['source']==entry and existing['rubric'].get('compact_minimum'), '输出位置已有另一版本细则')
+        else:
+            save(target,dict(source=entry,rubric=build_blind(entry,target.parent)))
+        print(target)
+        return 0
+    if args.command == 'grade-blind':
+        from rubric_workshop.blind_batch import evaluate, load, count_pure_exam_chars
+        record=load(args.rubric)
+        answer=args.answer.read_text(encoding='utf-8-sig')
+        marks=evaluate(record['source'],record['rubric'],answer)
+        print(json.dumps(dict(字数=count_pure_exam_chars(answer),得分=sum(m['score'] for m in marks),明细=marks),ensure_ascii=False,indent=2))
+        return 0
     if args.command == "grade":
         saved = json.loads(args.rubric.read_text(encoding="utf-8"))
         require(saved["状态"] in ("已锁定", "人工核对"), "仅可使用已锁定或人工核对的细则判卷")

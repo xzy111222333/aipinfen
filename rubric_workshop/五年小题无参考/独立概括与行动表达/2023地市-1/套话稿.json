@@ -1,0 +1,105 @@
+{
+  "answer": "坚持系统思维，凝聚各方合力，切实提升工作质效，推动高质量发展。",
+  "chars": 31,
+  "marks": [
+    {
+      "name": "核算方法与结果应用",
+      "score": 0.0,
+      "quote": "",
+      "why": "答卷仅为“坚持系统思维……”等泛化表述，未涉及制定GEP核算方法或应用核算结果，对象和关系均缺失。",
+      "decisions": [
+        {
+          "condition": "制定GEP核算方法并应用结果",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "依核算报告开发项目",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及依据GEP报告开发、经营任何项目，核心对象和关系缺失。",
+      "decisions": [
+        {
+          "condition": "依GEP报告开发经营项目",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "组建生态强村公司",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及组建生态强村公司，也未表达其转化、供给或交易生态产品的功能。",
+      "decisions": [
+        {
+          "condition": "组建生态强村公司转化生态产品价值",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "创新GEP贷融资",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及GEP贷、生态产品经营权质押或相关融资用途。",
+      "decisions": [
+        {
+          "condition": "创新GEP贷，生态产品经营权质押融资",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "强优势补短板引企业",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及按GEP报告强优势补短板，也未提及吸引环境敏感型企业落户。",
+      "decisions": [
+        {
+          "condition": "依GEP报告强优补短引环境敏感企业",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "生态价值参与分配",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及生态产品价值作为生产要素参与合作企业利润分配。",
+      "decisions": [
+        {
+          "condition": "生态产品价值作生产要素参与合作企业利润分配",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    },
+    {
+      "name": "湿地碳汇交易",
+      "score": 0.0,
+      "quote": "",
+      "why": "未提及湿地碳汇收储交易，也未表达GEP核算应用于碳汇市场。",
+      "decisions": [
+        {
+          "condition": "将GEP核算用于湿地碳汇交易",
+          "score": 0.0,
+          "quote": "",
+          "citations": []
+        }
+      ]
+    }
+  ],
+  "score": 0.0
+}

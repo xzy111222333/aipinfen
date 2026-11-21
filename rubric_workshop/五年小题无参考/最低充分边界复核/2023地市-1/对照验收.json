@@ -1,0 +1,48 @@
+{
+  "2023地市-1-等义转述": {
+    "passed": false,
+    "retained_evidence_to_review": [],
+    "original": 7.0,
+    "variant": 8.625,
+    "changes": [
+      {
+        "item": "依核算报告开发项目",
+        "condition": "依核算报告识别生态优势，开发项目，转资源优势为经济效益。",
+        "before": 1.0,
+        "after": 2.0
+      },
+      {
+        "item": "湿地碳汇交易",
+        "condition": "将GEP核算用于湿地碳汇收储交易，收益反哺生态建设。",
+        "before": 0.625,
+        "after": 1.25
+      }
+    ]
+  },
+  "2023地市-1-删融资": {
+    "passed": false,
+    "retained_evidence_to_review": [],
+    "original": 7.0,
+    "variant": 7.375,
+    "changes": [
+      {
+        "item": "依核算报告开发项目",
+        "condition": "依核算报告识别生态优势，开发项目，转资源优势为经济效益。",
+        "before": 1.0,
+        "after": 2.0
+      },
+      {
+        "item": "创新GEP贷融资",
+        "condition": "创新GEP贷，以生态产品使用经营权质押，解决项目融资。",
+        "before": 1.25,
+        "after": 0.0
+      },
+      {
+        "item": "湿地碳汇交易",
+        "condition": "将GEP核算用于湿地碳汇收储交易，收益反哺生态建设。",
+        "before": 0.625,
+        "after": 1.25
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "2025地市-1-删储碳": {
+    "passed": true,
+    "retained_evidence_to_review": [],
+    "original": 7.0,
+    "variant": 6.375,
+    "changes": [
+      {
+        "item": "碳库作用",
+        "condition": "老藤长期储碳，修剪物、凋落物归土增碳",
+        "before": 0.625,
+        "after": 0.0
+      }
+    ]
+  },
+  "2025地市-1-删文旅": {
+    "passed": true,
+    "retained_evidence_to_review": [],
+    "original": 7.0,
+    "variant": 7.0,
+    "changes": []
+  }
+}

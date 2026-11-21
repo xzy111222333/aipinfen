@@ -1,0 +1,38 @@
+{
+  "2025地市-1-删储碳": {
+    "passed": true,
+    "retained_evidence_to_review": [],
+    "original": 7.0,
+    "variant": 6.25,
+    "changes": [
+      {
+        "item": "老藤发挥碳库作用",
+        "condition": "考生须指出葡萄藤寿命长，能长期储存碳、发挥碳库作用。",
+        "before": 0.75,
+        "after": 0
+      }
+    ]
+  },
+  "2025地市-1-删文旅": {
+    "passed": false,
+    "retained_evidence_to_review": [
+      {
+        "item": "集约利用架下空间",
+        "condition": "考生须指出葡萄架占地少，架下留出大量空间可供活动使用。",
+        "evidence": [
+          "利用小环境气候种植喜阴植物，增加收入、创造空间；"
+        ]
+      }
+    ],
+    "original": 7.0,
+    "variant": 6.75,
+    "changes": [
+      {
+        "item": "集约利用架下空间",
+        "condition": "考生须指出葡萄架占地少，架下留出大量空间可供活动使用。",
+        "before": 0.25,
+        "after": 0
+      }
+    ]
+  }
+}

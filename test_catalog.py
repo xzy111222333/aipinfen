@@ -7,7 +7,7 @@ from unittest.mock import patch
 from playwright.sync_api import Page, sync_playwright
 
 import shenlun
-from collect_paper import collect_catalog
+from collect_paper import collect_catalog, read_answer_cards
 
 
 CATALOG = r"""
@@ -79,7 +79,14 @@ class CatalogTests(unittest.TestCase):
                 if paper_id == self.empty_id else """
                 <div class="merged-user-add-answers">
                   <div class="user-add-answer-item">
-                    <div class="answer-header"><span>机构甲</span></div>
+                    <div class="answer-header"><span>机构甲</span>
+                      <div class="answer-actions">
+                        <div class="action-item"><button>1,234</button></div>
+                        <div class="action-item"><button>0</button></div>
+                        <div class="action-item"><button class="comment-btn">99</button></div>
+                        <div class="action-item"><button class="report-btn"></button></div>
+                      </div>
+                    </div>
                     <div class="answer-content">答案正文</div>
                   </div>
                 </div>"""
@@ -112,6 +119,7 @@ class CatalogTests(unittest.TestCase):
         for path in shenlun.ARCHIVE.rglob("第1题.md"):
             text = path.read_text(encoding="utf-8")
             self.assertIn("机构甲", text)
+            self.assertIn("点赞 1234 · 点踩 0 · 采集时间", text)
             self.assertIn("(材料1.md)", text)
             self.assertTrue(path.with_name("材料1.md").is_file())
 
@@ -121,6 +129,19 @@ class CatalogTests(unittest.TestCase):
             self.collect()
         self.assertEqual(self.details, [1, 2])
         self.assertEqual(json.loads(self.progress.read_text(encoding="utf-8"))["paper_id"], 1)
+
+    def test_missing_vote_count_stops_instead_of_recording_zero(self):
+        self.page.route("**/vote-check", lambda route: route.fulfill(
+            content_type="text/html", body="""
+            <div class="user-add-answer-item"><div class="answer-header">
+              <span>Author</span><div class="answer-actions">
+                <div class="action-item"><button>8</button></div>
+                <div class="action-item"><button></button></div>
+              </div></div><div class="answer-content">Answer</div></div>"""
+        ))
+        self.page.goto("https://local-test.invalid/vote-check")
+        with self.assertRaisesRegex(ValueError, "赞踩计数"):
+            read_answer_cards(self.page.locator(".user-add-answer-item"))
 
     def test_explicit_empty_answers_are_archived_and_collection_continues(self):
         self.empty_id = 1

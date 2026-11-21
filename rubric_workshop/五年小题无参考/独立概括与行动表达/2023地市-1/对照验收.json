@@ -1,0 +1,39 @@
+{
+  "2023地市-1-等义转述": {
+    "passed": false,
+    "retained_evidence_to_review": [
+      {
+        "item": "依核算报告开发项目",
+        "condition": "依GEP报告开发经营项目",
+        "evidence": [
+          "制定核算方法，进行评估、核算、探索结果落地应用。",
+          "明确生态资源优势，组建生态强村公司，开发特色项目、输出生态产品。"
+        ]
+      }
+    ],
+    "original": 8.75,
+    "variant": 7.75,
+    "changes": [
+      {
+        "item": "依核算报告开发项目",
+        "condition": "依GEP报告开发经营项目",
+        "before": 2.0,
+        "after": 1.0
+      }
+    ]
+  },
+  "2023地市-1-删融资": {
+    "passed": true,
+    "retained_evidence_to_review": [],
+    "original": 8.75,
+    "variant": 7.5,
+    "changes": [
+      {
+        "item": "创新GEP贷融资",
+        "condition": "创新GEP贷，生态产品经营权质押融资",
+        "before": 1.25,
+        "after": 0.0
+      }
+    ]
+  }
+}

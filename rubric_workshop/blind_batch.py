@@ -211,7 +211,20 @@ def evaluate_boundaries(src,r,answer):
     for attempt in range(3):
         try:
             if r.get("review_each_unit"):
-                decisions=call_llm_json('逐个编号核对全文。对每条条件先找最相关句子，再判断上下文是否表达同一意思。返回 {"checks":{"1.1":[true,"答卷连续引文"],"1.2":[false,"缺失的具体意思"]}}。所有编号必须出现。肯定判断只摘能定位证据的一小段连续答卷原文，无需复制整句；否定判断用简短理由说明缺了哪层信息。',payload)["checks"]
+                if r.get('indexed_evidence'):
+                    spans = re.findall(r'[^。！？；\n]+[。！？；]?|[。！？；]', answer)
+                    numbered = {str(n): text for n,text in enumerate(spans,1)}
+                    request = dict(payload, 答卷=numbered)
+                    raw = call_llm_json('逐项按充分意思判定，可综合多个原句识别关系。每项返回[命中布尔值,支持判定的原句编号数组,具体理由]。命中时至少一个编号；未中时说明哪一层缺失。只能选现有编号。仅输出 {"checks":{"1.1":[true,[1],"理由"]}}。',request)['checks']
+                    decisions = {}
+                    citations = {}
+                    for key,(hit,ids,reason) in raw.items():
+                        if type(hit) is not bool or not isinstance(ids,list) or not isinstance(reason,str) or not reason.strip() or any(type(n) is not int or str(n) not in numbered for n in ids) or (hit and not ids):
+                            raise ValueError('答卷句号或认定理由无效')
+                        citations[key] = [numbered[str(n)] for n in ids]
+                        decisions[key] = [hit,citations[key][0] if hit else reason]
+                else:
+                    decisions=call_llm_json('逐个编号核对全文。先读出该条件的必要意思；“如”“例如”等举例只说明可接受的证据。先将答卷的主体、动作和上下句的反馈关系对上必要意思。必要意思已成立，换例、换词或省去例子都应命中；否定时须指出必要意思本身缺什么。限定对象或动作确实改变时严格区分。返回 {"checks":{"1.1":[true,"答卷连续引文"],"1.2":[false,"缺失的具体意思"]}}。所有编号必须出现。肯定判断只摘能定位证据的一小段连续答卷原文，无需复制整句；否定判断用简短理由说明缺了哪层信息。',payload)["checks"]
                 if set(decisions)!=set(checks) or not all(isinstance(v,list) and len(v)==2 and type(v[0]) is bool and isinstance(v[1],str) and v[1].strip() for v in decisions.values()):
                     raise ValueError("逐项核查不全")
                 verdict={k:v[1] for k,v in decisions.items() if v[0]}
@@ -230,6 +243,9 @@ def evaluate_boundaries(src,r,answer):
                     rows.append(dict(condition=condition,score=weight if quote else 0,quote=quote))
                 if r.get("review_each_unit"):
                     for j,row in enumerate(rows,1):
+                        if r.get('indexed_evidence'):
+                            row['citations'] = citations[f"{i}.{j}"]
+                            row['reason'] = raw[f"{i}.{j}"][2]
                         if not row["quote"]: row["reason"]=decisions[f"{i}.{j}"][1]
                 marks.append(dict(name=item["name"],score=sum(x["score"] for x in rows),quote=next((x["quote"] for x in rows if x["quote"]),""),why="；".join(("认定：" if x["quote"] else "未认定：")+x["condition"] for x in rows),decisions=rows))
             return marks
@@ -239,6 +255,39 @@ def evaluate_boundaries(src,r,answer):
 
 
 TASK_VALUE = """配分前逐项假设删去该信息，说明读者会少知道什么、少能做什么，或哪一问未获回答。若与另一项的损失相同则合并；没有独立损失的背景只作替代表达或佐证。组织部分单独观察现有文字的顺序、衔接、语气及读者能否行动，不能因遗漏某项内容再扣组织分。标题、呼吁位置、署名日期由题面和用途决定。引用原文须保留主体、因果方向和已然未然。"""
+
+
+def core_rubric(src):
+    """将给分条件与帮助读懂材料的例子分别保存；阅卷只传给分条件。"""
+    prompt = """从题目、要求与材料制定小题细则。按题干动词选择概括层次，分清各项独立任务。形成条件前问：一个考生准确概括了对象、行动或关系，仍缺什么任务？例名、渠道名称、数字等只有改变任务实质才设为必要条件。读者行动、文种效果可以独立考查。相互配合的双方行动已经能说明关系。不能用完整范文当唯一答案。
+只返回紧凑JSON，英文键 rows。每行是六列数组：[分区,方面名,子分,仅一句最低充分意思,依据段号,例证]。内容行的依据段号照抄材料键；组织行可为空。例证单独存，评分人只看最低充分意思。禁止把一串具体事实绑成一份子分。一个方面可以有多行分别认分。子分用0.25的正倍数，每个分区加和必须恰等于给定预算。"""
+    payload = dict(src)
+    for attempt in range(3):
+        raw = call_llm_json(prompt, payload)
+        try:
+            totals = dict.fromkeys(src['budget'], 0)
+            items = {}
+            for zone, name, weight, core, ref, example in raw['rows']:
+                if zone not in totals or type(weight) not in (int, float) or weight <= 0 or weight * 4 % 1:
+                    raise ValueError('分区或子分无效')
+                if not all(isinstance(v, str) and v.strip() for v in (name, core)):
+                    raise ValueError('缺少方面或给分条件')
+                if zone == '内容' and ref not in src['materials']:
+                    raise ValueError(f'材料无此段号 {ref}')
+                item = items.setdefault((zone, name), dict(zone=zone,name=name,points=0,evidence={},units=[],examples=[]))
+                if ref in src['materials']:
+                    item['evidence'][ref] = src['materials'][ref]
+                item['examples'].append(example)
+                item['units'].append([weight, '交付' if zone=='组织' else '语义', core])
+                item['points'] += weight
+                totals[zone] += weight
+            if totals != src['budget']:
+                raise ValueError(f'实际合计{totals}；逐区修正子分，保留完整行')
+            return dict(items=list(items.values()),review_each_unit=True,limit=src['question'])
+        except (KeyError, ValueError, TypeError) as exc:
+            if attempt == 2:
+                raise
+            payload = dict(src, 上次输出=raw, 校正=str(exc))
 
 
 def task_rubric(src, *, use_task_route=True):
@@ -255,13 +304,20 @@ def task_rubric(src, *, use_task_route=True):
     if not use_task_route:
         route = ""
     else:
-        route += TASK_VALUE
+        route += TASK_VALUE + "先逐项写最低充分意思。对每个拟扣的限定再问：两份作答只相差这个限定，哪一项题干任务完成度真的不同？若无法指出，删除这个必要条件。关系可由上下文中的双方行动直接呈现；写明实质即可，不另索取总结句。"
     prompt = route + """仅使用所给题干、要求、指定材料。按分区预算制订考生在字限内能完成的细则。
-返回 JSON 对象 {"items":[{"name":"评分项","zone":"内容","evidence":{"输入原段号":"连续原文短语"},"units":[[1,"语义","最短充分条件；等价表达或相反边界"]]}],"limit":"字数要求"}。
+返回 JSON 对象 {"items":[{"name":"评分项","zone":"内容","evidence":{"输入原段号":"原句编号"},"units":[[1,"语义","最短充分条件；等价表达或相反边界"]]}],"limit":"字数要求"}。
 不要预设项目个数。每个子分只购买一份独立信息。仅当题意或对象需要时用限定口径；一般概括用语义口径；文种效果用交付口径。三种口径固定为限定、语义、交付。实质一致的不同组织方式、等义表达或举例均认。可分别表达的不同任务分别计分，同一信息不能跨项重复。子分是0.25的正倍数。内容项必须逐字引材料，组织项可用空证据。不要读入机构答案或猜测考生成绩。"""
     payload=dict(src)
+    evidence_index = {}
+    for paragraph, text in src["materials"].items():
+        sentences = re.findall(r"[^。！？]+[。！？]?|[。！？]", text)
+        evidence_index[paragraph] = {str(n): sentence for n, sentence in enumerate(sentences, 1)}
+    payload["materials"] = evidence_index
+    prompt += '材料每段已按句编号。evidence的值填写该段内支持条件的原句编号字符串，程序据此摘录原文。'
     for attempt in range(3):
         try:
+            result = {}
             result=call_llm_json(prompt,payload)
             totals=dict.fromkeys(src["budget"],0)
             names=set()
@@ -271,6 +327,10 @@ def task_rubric(src, *, use_task_route=True):
                 evidence=item["evidence"]
                 if item["zone"]=="内容" and not evidence: raise ValueError("内容项缺材料依据")
                 for para,quote in evidence.items():
+                    if (type(quote) in (int, str) and str(quote).isdigit()):
+                        if str(quote) not in evidence_index.get(para, {}):
+                            raise ValueError(f"原句编号越界：{para}，句号{quote}")
+                        evidence[para] = quote = evidence_index[para][str(quote)]
                     if not is_verbatim_quote(quote,src["materials"].get(para,"")):raise ValueError("材料引文错误："+para)
                 rows=item["units"]
                 if not rows:raise ValueError("缺子分")
@@ -284,7 +344,7 @@ def task_rubric(src, *, use_task_route=True):
             return result
         except (KeyError,TypeError,ValueError) as exc:
             if attempt==2:raise
-            payload["校正"]=str(exc)
+            payload = dict(payload, 上次输出=result, 校正=str(exc))
 
 
 def aspect_rubric(src):
@@ -550,6 +610,20 @@ def evaluate_aspects(src,r,answer):
     payload=dict(题面=src["question"],方面=rules,答卷=answer,字数=count_pure_exam_chars(answer))
     prompt = """评分，不重制细则。比较整份答卷是否表达每个方面的核心意思。claim是一种满分表达，alternative是另一种；证明材料、额外机理、例子不可当成额外门槛。以含义匹配并联系上下文；仅同属一个话题不足以给分。返回 {"levels":{"1":[2,"连续答卷原话","简短判据"]}}。全部编号各一次：2达到完整意思，1达到部分意思，0缺失或错误；非零必须从答卷复制一段短引文，零分引文可空。"""
     prompt += "部分分必须从引文说明已满足partial的哪一部分对象和关系。只提到同一物件、人员或地点而没有相关动作或关系，判零。审查每笔组织分是否有独立的表达证据。"
+    if r.get('indexed_levels'):
+        if r.get('reviewed_minimum'):
+            from scoring.engine import truncate_by_exam_grids
+            limit = int(re.search(r'不超过\s*(\d+)\s*字', src['question'])[1])
+            answer = truncate_by_exam_grids(answer, limit)[0]
+            payload['材料'] = src['materials']
+            for key, item in zip(keys, r['items']):
+                rules[key].update(zone=item['zone'], optional=item['optional'])
+                if not r.get('compact_minimum'):
+                    rules[key]['boundary'] = item['boundary']
+            prompt += '可省略的细节不得造成扣分。对照材料校核答卷事实，结合多处原句判断上位概括是否已经表达必要关系。组织按全文效果评。'
+        spans=re.findall(r'[^。！？；\n]+[。！？；]?|[。！？；]',answer)
+        payload['答卷']={str(n):text for n,text in enumerate(spans,1)}
+        prompt += '本次证据改用编号数组，返回每项[档位,答卷原句编号数组,理由]。优先比对最低充分意思或等价意思，部分答到时对照部分档。核对上下文中的事实矛盾，包括把单次情形改成固定规定；涉及矛盾的方面不能判满分。'
     for attempt in range(3):
         try:
             levels=call_llm_json(prompt,payload)["levels"]
@@ -557,10 +631,17 @@ def evaluate_aspects(src,r,answer):
             marks=[]
             for k,item in zip(keys,r["items"]):
                 level,q,why=levels[k]
+                if r.get('indexed_levels'):
+                    if not isinstance(q,list) or any(type(n) is not int or not 1<=n<=len(spans) for n in q) or level and not q:
+                        raise ValueError('答卷证据编号无效')
+                    citations=[spans[n-1] for n in q]
+                    q=citations[0] if citations else ''
                 if type(level) is not int or level not in (0,1,2) or not isinstance(why,str) or not why.strip() or ((level or q) and not is_verbatim_quote(q,answer)):
                     raise ValueError("检查编号"+k+"档位和连续引文")
                 score=item["points"]*level/2
                 marks.append(dict(name=item["name"],score=score,quote=q,why=why,decisions=[dict(condition=item["claim"],score=score,quote=q)]))
+                if r.get('indexed_levels'):
+                    marks[-1]['decisions'][0]['citations']=citations
             return marks
         except (KeyError,ValueError,TypeError) as exc:
             if attempt==2:raise

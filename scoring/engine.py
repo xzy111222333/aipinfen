@@ -42,13 +42,34 @@ def _resolve_api_key(api_key=None):
     raise KeyError("未找到 DEEPSEEK_API_KEY，请在环境变量或项目根目录 .env 文件中配置")
 
 
+JIJI_URL = "https://www.jiji.cc/v1/responses"
+
+
 def llm_cache_model(api_key=None):
+    if api_key is None and _read_api_setting("SHENLUN_JIJI_API_KEY"):
+        return JIJI_URL, RELAY_MODEL
     return (RELAY_URL, RELAY_MODEL) if api_key is None and _read_api_setting(RELAY_KEY) else MODEL_DEFAULT
+
+
+def _read_relay_response(response):
+    if response.headers.get_content_type() != "text/event-stream":
+        return json.load(response)
+    for line in response:
+        if line.startswith(b"data:"):
+            data = line[5:].strip()
+            if data == b"[DONE]":
+                break
+            event = json.loads(data)
+            if event.get("type") in ("response.completed", "response.failed", "response.incomplete"):
+                return event["response"]
+    raise ConnectionError("Response stream ended before completion")
 
 
 def call_llm_json(system_prompt, user_payload, api_key=None, model=None, temperature=0.0, max_tokens=12000):
     relay_key = _read_api_setting(RELAY_KEY) if api_key is None else None
-    url = RELAY_URL if relay_key else API_URL
+    jiji_key = _read_api_setting("SHENLUN_JIJI_API_KEY") if api_key is None else None
+    url = JIJI_URL if jiji_key else RELAY_URL if relay_key else API_URL
+    relay_key = jiji_key or relay_key
     key = relay_key or _resolve_api_key(api_key)
     model = model or (RELAY_MODEL if relay_key else MODEL_DEFAULT)
     headers = {"Content-Type": "application/json"}
@@ -68,6 +89,10 @@ def call_llm_json(system_prompt, user_payload, api_key=None, model=None, tempera
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
+        if jiji_key:
+            headers["x-openai-actor-authorization"] = "local-image-extension"
+            body = dict(model=model, instructions=sys_msg, input=json.dumps(user_payload, ensure_ascii=False),
+                        max_output_tokens=max_tokens, store=False, stream=True, temperature=temperature)
         req = urllib.request.Request(
             url,
             data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
@@ -76,9 +101,15 @@ def call_llm_json(system_prompt, user_payload, api_key=None, model=None, tempera
         req.add_unredirected_header("Authorization", f"Bearer {key}")
         try:
             with urllib.request.urlopen(req, timeout=180) as resp:
-                raw = json.load(resp)
+                raw = _read_relay_response(resp) if jiji_key else json.load(resp)
             if relay_key and raw.get("model") != model:
                 raise RuntimeError(f"中转站返回的模型与请求不一致，请求模型：{model}")
+            if jiji_key:
+                if raw.get("status") != "completed":
+                    raise ValueError(f"中转响应未完成: {raw.get('status')}")
+                content = "".join(part["text"] for item in raw.get("output", []) if item.get("type")=="message"
+                                  for part in item.get("content", []) if part.get("type")=="output_text")
+                return json.loads(content.strip().removeprefix("```json").removesuffix("```").strip())
             choice = raw["choices"][0]
             if choice["finish_reason"] != "stop":
                 raise ValueError(f"模型输出被截断: {choice['finish_reason']}")

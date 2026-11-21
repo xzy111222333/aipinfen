@@ -68,7 +68,7 @@ class BlindBatchTests(unittest.TestCase):
             first_prompt = model.call_args.args[0]
             task_rubric(dict(src, type=2))
             self.assertNotEqual(first_prompt, model.call_args.args[0])
-            self.assertEqual(model.call_args.args[1], dict(src, type=2))
+            self.assertEqual(model.call_args.args[1], dict(src, type=2, materials={k: {"1": v} for k, v in src["materials"].items()}))
         with patch("rubric_workshop.blind_batch.call_llm_json", return_value=response):
             with self.assertRaises(ValueError):
                 task_rubric(dict(src, budget={"内容": 2}))

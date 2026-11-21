@@ -1,0 +1,54 @@
+[
+  {
+    "name": "葡萄园储碳转述",
+    "left": 1.0,
+    "right": 1.0,
+    "passed": true,
+    "changes": {}
+  },
+  {
+    "name": "葡萄园保土与储碳",
+    "left": 1.0,
+    "right": 0,
+    "passed": true,
+    "changes": {
+      "绿色循环与碳库": 1.0
+    }
+  },
+  {
+    "name": "葡萄园删储碳",
+    "left": 4.0,
+    "right": 4.5,
+    "passed": false,
+    "changes": {
+      "漏斗架栽培的生态功能": -0.5,
+      "庭园小气候与复合利用": 0.5,
+      "传承传统技艺、维护生态链": -0.5
+    }
+  },
+  {
+    "name": "发布词流程转述",
+    "left": 2,
+    "right": 2,
+    "passed": true,
+    "changes": {}
+  },
+  {
+    "name": "发布词删流程",
+    "left": 2,
+    "right": 0,
+    "passed": true,
+    "changes": {
+      "参与流程与方式": 2
+    }
+  },
+  {
+    "name": "发布词删报名指引",
+    "left": 14.5,
+    "right": 12.5,
+    "passed": true,
+    "changes": {
+      "参与流程与方式": 2
+    }
+  }
+]

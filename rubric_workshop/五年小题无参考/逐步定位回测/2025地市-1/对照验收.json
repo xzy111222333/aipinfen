@@ -1,0 +1,23 @@
+{
+  "2025地市-1-删储碳": {
+    "passed": true,
+    "retained_evidence_to_review": [],
+    "original": 10,
+    "variant": 8,
+    "changes": [
+      {
+        "item": "碳库功能",
+        "condition": "葡萄藤寿命长、储碳久，修剪物和凋落物还田补充有机碳，增强土壤碳库。",
+        "before": 2,
+        "after": 0
+      }
+    ]
+  },
+  "2025地市-1-删文旅": {
+    "passed": false,
+    "retained_evidence_to_review": [],
+    "original": 10,
+    "variant": 10,
+    "changes": []
+  }
+}

@@ -8,9 +8,27 @@ from datetime import datetime
 from playwright.sync_api import Error, TimeoutError, expect
 
 
-ACTION_DELAY_MS = 1200
-PAGE_DELAY_MS = 3500
-ANSWER_SETTLE_MS = 1000
+ACTION_DELAY_MS = 1000
+PAGE_DELAY_MS = 3000
+ANSWER_SETTLE_MS = 800
+
+
+def read_answer_cards(cards):
+    records = cards.evaluate_all("""cards => cards.map(card => {
+        const buttons = [...card.querySelectorAll('.answer-header .answer-actions .action-item button')]
+            .filter(button => !button.matches('.comment-btn, .report-btn'));
+        return {
+            author: card.querySelector('.answer-header')?.firstElementChild?.innerText.trim(),
+            text: card.querySelector('.answer-content')?.innerText.trim(),
+            votes: buttons.map(button => button.innerText.trim())
+        };
+    })""")
+    for record in records:
+        votes = record.pop("votes")
+        if len(votes) != 2 or any(not re.fullmatch(r"[0-9]+(?:,[0-9]{3})*", count) for count in votes):
+            raise ValueError(f"答案赞踩计数无法确认，请核对页面结构：{votes!r}")
+        record["likes"], record["dislikes"] = (int(count.replace(",", "")) for count in votes)
+    return records
 
 
 def save_cursor(path, cursor):
@@ -324,10 +342,7 @@ def collect_paper(page, write_paper, stopped, category="公务员", region="国�
         empty_notice = page.locator(".question-section").get_by_text("暂无参考答案", exact=True)
 
         def snapshot():
-            return cards.evaluate_all("""cards => cards.map(card => ({
-                author: card.querySelector('.answer-header')?.firstElementChild?.innerText.trim(),
-                text: card.querySelector('.answer-content')?.innerText.trim()
-            }))""")
+            return read_answer_cards(cards)
 
         for number, tab in enumerate(question_tabs, 1):
             switching = "active" not in (tab.get_attribute("class") or "").split()
@@ -362,9 +377,10 @@ def collect_paper(page, write_paper, stopped, category="公务员", region="国�
                 page.wait_for_timeout(ANSWER_SETTLE_MS)
                 check_access()
                 current = snapshot()
-                if current[:len(card_data)] != card_data:
+                identities = lambda records: [(card["author"], card["text"]) for card in records]
+                if identities(current[:len(card_data)]) != identities(card_data):
                     raise stopped(f"第 {number} 题滚动后已读答案发生变化。")
-                stable = stable + 1 if current == card_data else 0
+                stable = stable + 1 if len(current) == len(card_data) else 0
                 card_data = current
                 if stable == 2:
                     break

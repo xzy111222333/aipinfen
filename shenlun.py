@@ -5,6 +5,7 @@ import re
 import subprocess
 from pathlib import Path, PureWindowsPath
 from tempfile import TemporaryDirectory
+from datetime import datetime
 
 
 CARD_BOUNDARY = re.compile(
@@ -156,6 +157,7 @@ def write_paper(category, region, paper_id, title, materials, questions, referen
         files[f"材料{number}.md"] = f"# 材料 {number}\n\n{material}\n"
 
     counts = []
+    captured_at = datetime.now().astimezone().isoformat(timespec="seconds")
     for number, (question, answers) in enumerate(questions, 1):
         counts.append(len(answers))
         material_numbers = references.get(number, range(1, len(materials) + 1))
@@ -171,7 +173,12 @@ def write_paper(category, region, paper_id, title, materials, questions, referen
             f"## 答案（{len(answers)} 份）",
         ]
         for answer in answers:
-            sections.extend((f"### {answer['author']}", answer["text"]))
+            sections.append(f"### {answer['author']}")
+            if "likes" in answer and "dislikes" in answer:
+                sections.append(
+                    f"点赞 {answer['likes']} · 点踩 {answer['dislikes']} · 采集时间 {captured_at}"
+                )
+            sections.append(answer["text"])
         files[f"第{number}题.md"] = "\n\n".join(sections) + "\n"
 
     parent = ARCHIVE / category / region
@@ -328,12 +335,19 @@ def run_browser(profile, check_only, stealth, paper_id=None):
                                 e.parentElement.className, e.innerText.trim().slice(0, 65)])
                         """))
                         continue
-                    if command not in {"inspect", "collect"}:
+                    if command not in {"inspect", "collect", "inspect-votes"}:
                         print("未知命令。")
                         continue
                     current = next((tab for tab in context.pages if tab.url.startswith(f"{PAPER_LIST}/detail/")), None)
                     if current is None:
                         print("当前没有打开试卷详情。")
+                        continue
+                    if command == "inspect-votes":
+                        print(current.locator(".user-add-answer-item .answer-header").first.evaluate(
+                            """node => [...node.querySelectorAll('.action-item button')].map(
+                                button => ({classes: button.className, text: button.innerText.trim()})
+                            )"""
+                        ))
                         continue
                     if command == "collect":
                         from collect_paper import collect_paper
@@ -365,12 +379,14 @@ def run_browser(profile, check_only, stealth, paper_id=None):
 
 
 def main():
+    global ARCHIVE
     parser = argparse.ArgumentParser(description="申论答案本地导入和浏览器入口")
     commands = parser.add_subparsers(dest="command", required=True)
     browser = commands.add_parser("browser", help="打开专用浏览器窗口")
     browser.add_argument("--blank", action="store_true", help="打开空白页验证环境")
     browser.add_argument("--stealth", action="store_true", help="使用 ZIP 项目的轻量反检测脚本")
     browser.add_argument("--paper-id", type=int, help="直接打开指定试卷")
+    browser.add_argument("--archive-dir", type=Path, help="本轮归档目录")
     importer = commands.add_parser("import-answers", help="从本地文本导入一道题的答案")
     importer.add_argument("source", type=Path)
     importer.add_argument("output", type=Path)
@@ -387,6 +403,9 @@ def main():
     archive.add_argument("--questions", type=int, required=True)
     args = parser.parse_args()
     if args.command == "browser":
+        if args.archive_dir:
+            ARCHIVE = args.archive_dir.resolve()
+            ARCHIVE.mkdir(parents=True, exist_ok=True)
         try:
             open_browser(args.blank, args.stealth, args.paper_id)
         except NavigationStopped as error:

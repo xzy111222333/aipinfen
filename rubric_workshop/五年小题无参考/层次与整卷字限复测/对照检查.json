@@ -1,0 +1,95 @@
+[
+  {
+    "name": "葡萄园储碳转述",
+    "left": 1.0,
+    "right": 1.0,
+    "numeric_pass": true,
+    "changes": {},
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "葡萄园保土与储碳",
+    "left": 1.0,
+    "right": 0.0,
+    "numeric_pass": true,
+    "changes": {
+      "固碳与生态链": 1.0
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "葡萄园删储碳",
+    "left": 9.0,
+    "right": 7.0,
+    "numeric_pass": true,
+    "changes": {
+      "空间与水土保护": 1.0,
+      "固碳与生态链": 1.0
+    },
+    "retained_evidence_to_review": [
+      {
+        "item": "空间与水土保护",
+        "condition": "漏斗架通过立体空间利用和结构设计，兼顾光合效率与防风固土保水。",
+        "quote": "发展漏斗架栽培方式，传承传统技艺，利用空间、提高品质，保护水土、涵养水源"
+      }
+    ]
+  },
+  {
+    "name": "发布词流程转述",
+    "left": 2.25,
+    "right": 3.25,
+    "numeric_pass": false,
+    "changes": {
+      "报名行动号召": -1.0
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "发布词删流程",
+    "left": 2.25,
+    "right": 1.0,
+    "numeric_pass": true,
+    "changes": {
+      "项目平台与发布计划": 1.0,
+      "参与流程与报名方式": 1.25,
+      "报名行动号召": -1.0
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "发布词删报名指引",
+    "left": 15.0,
+    "right": 12.5,
+    "numeric_pass": true,
+    "changes": {
+      "参与流程与报名方式": 2.5
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "绿色种植概括与例证逐项等价",
+    "left": 2.0,
+    "right": 2.0,
+    "numeric_pass": true,
+    "changes": {},
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "绿色种植与空口号",
+    "left": 2.0,
+    "right": 0.0,
+    "numeric_pass": true,
+    "changes": {
+      "绿色循环": 2.0
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "葡萄园删文旅",
+    "left": 9.0,
+    "right": 9.0,
+    "numeric_pass": false,
+    "changes": {},
+    "retained_evidence_to_review": []
+  }
+]

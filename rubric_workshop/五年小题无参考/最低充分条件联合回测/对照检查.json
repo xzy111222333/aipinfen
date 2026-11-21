@@ -1,0 +1,78 @@
+[
+  {
+    "name": "葡萄园储碳转述",
+    "left": 1.0,
+    "right": 1.0,
+    "numeric_pass": true,
+    "changes": {},
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "葡萄园保土与储碳",
+    "left": 1.0,
+    "right": 0,
+    "numeric_pass": true,
+    "changes": {
+      "绿色循环与碳库": 1.0
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "葡萄园删储碳",
+    "left": 5.0,
+    "right": 3.5,
+    "numeric_pass": true,
+    "changes": {
+      "庭园小气候与复合利用": 0.5,
+      "绿色循环与碳库": 0.5,
+      "传承传统技艺、维护生态链": 0.5
+    },
+    "retained_evidence_to_review": [
+      {
+        "item": "庭园小气候与复合利用",
+        "condition": "架下种喜阴植物增附加收入",
+        "quote": "种植喜阴植物，增加收入、创造空间"
+      },
+      {
+        "item": "传承传统技艺、维护生态链",
+        "condition": "人与庭园植物共维生态链",
+        "quote": "人与自然相适应，构成庭园生态链"
+      }
+    ]
+  },
+  {
+    "name": "发布词流程转述",
+    "left": 2,
+    "right": 2,
+    "numeric_pass": true,
+    "changes": {},
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "发布词删流程",
+    "left": 2,
+    "right": 0,
+    "numeric_pass": true,
+    "changes": {
+      "参与流程与方式": 2
+    },
+    "retained_evidence_to_review": []
+  },
+  {
+    "name": "发布词删报名指引",
+    "left": 14.5,
+    "right": 11.25,
+    "numeric_pass": true,
+    "changes": {
+      "参与流程与方式": 2,
+      "层次清晰": 1.25
+    },
+    "retained_evidence_to_review": [
+      {
+        "item": "层次清晰",
+        "condition": "按发布、意义、流程、号召顺序组织",
+        "quote": "无论您从事什么职业、处于什么年龄阶段，都欢迎加入公众科学行列，一起探索科学奥秘！"
+      }
+    ]
+  }
+]

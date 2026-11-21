@@ -7,6 +7,9 @@ from rubric_workshop.blind_batch import OUT, catalog, aspect_rubric, layered_rub
 
 
 def cases_for(key):
+    if key == "2023地市-1":
+        return {f"{key}-{name}.json": load(OUT / "袁东GEP盲评" / (name+".json"))["answer"]
+                for name in ("原稿", "等义转述", "删融资")}
     baseline = OUT / "边界计分复测"
     answers = {p.name: load(p)["answer"] for p in sorted(baseline.glob(key + "-答卷*.json"))}
     if key == "2025地市-1":
@@ -75,6 +78,11 @@ def assess(output):
         ("发布词删流程", "2026地市-3-答卷3", "2026地市-3-答卷5", "content", "greater"),
         ("发布词删报名指引", "2026地市-3-答卷2", "2026地市-3-删报名指引", "score", "greater"),
     ]
+    if (output / "2023地市-1.json").exists():
+        comparisons.extend([
+            ("GEP碳汇等义转述", "2023地市-1-原稿", "2023地市-1-等义转述", "score", "equal"),
+            ("GEP删除融资", "2023地市-1-原稿", "2023地市-1-删融资", "score", "greater"),
+        ])
     if (output / "2025地市-1-概括句.json").exists():
         comparisons.extend([
             ("绿色种植概括与例证逐项等价", "2025地市-1-概括句", "2025地市-1-例证句", "content", "equal"),
@@ -131,7 +139,7 @@ if __name__ == "__main__":
         parser.error("两种实验方法须分开运行")
     if args.minimum_from and args.minimum_from.resolve() == args.output.resolve():
         parser.error("基础细则与回测输出须为不同目录")
-    keys = ["2025地市-1", "2026副省-1", "2026地市-3", "2023执法-3"]
+    keys = ["2023地市-1", "2025地市-1", "2026副省-1", "2026地市-3", "2023执法-3"]
     if args.layered or args.hierarchy:
         keys.append("2024执法-4")
     with ThreadPoolExecutor(4) as pool:
