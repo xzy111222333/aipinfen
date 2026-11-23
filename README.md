@@ -1,5 +1,7 @@
 # 申论真题归档与量化批改系统
 
+小程序服务端接入使用独立目录 [shenlun_backend](shenlun_backend/README.md)，内含五份带权参考的预制流程与按冻结细则批改的入口。
+
 ## 一、功能简介
 
 2026-11-21 重采版通过 `run.cmd browser --stealth --archive-dir 试卷_含赞踩_2026-11-21` 启动。在专用浏览器中复用登录会话后，终端输入 `batch` 开始全量采集。新目录独立保存归档和断点，每份答案额外记录点赞、点踩与采集时间。读取到空白或无法解析的赞踩计数时会报错，以便核对网页。目录翻页等待 3 秒，普通操作等待 1 秒，答案区仍连续检查两次稳定状态。
@@ -63,6 +65,8 @@
 ### 4. 对照评测
 
 热门小题可以用 `python -m scoring.class_a_pipeline "题目路径" --weighted --exclude-sources "留出来源甲" "留出来源乙" --output "实验结果.json"` 制作冻结细则和标杆，再匿名评阅留出稿。加 `--preparation-model gpt-6.2-sol` 时，制作端读取 `SHENLUN_MDKJ_RESPONSES_API_KEY` 使用 Responses 接口，批改仍由原 DeepSeek 中转处理。结果记录建表稿、留出稿、细则、标杆和逐项评分。普通小题的标杆连续书写，选定稿以有效字数的九成为下限。公文按必要格式换行，字限与排版分开核算。掌握答题区规格时，可对单题追加 `--answer-sheet 每行格数 区域行数`。
+
+高分参照库的多题实验使用 `python -m scoring.run_reference_holdouts "样本.json路径" "带赞踩试卷目录" "结果目录" "题库键@版本" --preparation-model gpt-6.2-sol`。程序先落盘留出版本和高分线，再隔离同作者及近似原文。制作端逐字提取建表稿正文，校验材料短引。程序计格后，制作模型按实测余量复核成稿，补写内容需能定位到材料和定稿。细则、逐项评分及最终模型原稿按题保存。
 
 当前批改读取工作区 `.env` 或进程环境中的 `SHENLUN_CHYYDS_API_KEY`，使用 `chyyds.com` 的 `deepseek-v4.1-flash`。未配置该项时使用 `DEEPSEEK_API_KEY` 直连。正式基线固定使用直连，细则缓存按模型和线路分别保存。
 

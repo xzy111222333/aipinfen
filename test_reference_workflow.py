@@ -126,15 +126,46 @@ class TestReferenceWorkflowOffline(unittest.TestCase):
             wrapped = "问题：①有问题。\n建议：①补齐事项。②加强服务。"
             pack = {**pack, "字限": 25}
             pair = {**short, "候选A": wrapped, "候选B": wrapped}
-            answer = build_benchmark(pack, two_questions, {}, [], work, call=Mock(side_effect=[plan, pair]))
+            answer = build_benchmark(pack, two_questions, {}, [], work, call=Mock(side_effect=[plan, pair, {"正文": wrapped, "补写": [], "复核说明": "已覆盖"}]))
             self.assertEqual(answer["正文"], wrapped.replace("\n", ""))
             self.assertNotIn("排版估算", answer)
             align["文种格式硬要求"] = {"需要标题": True, "禁止分条列点": True}
-            answer = build_benchmark(pack, align, {}, [], work, call=Mock(side_effect=[plan, document]))
+            with self.assertRaisesRegex(ValueError, "答题区域仅25格"):
+                build_benchmark(pack, align, {}, [], work, call=Mock(side_effect=[plan, document, document, document]))
+            pack = {**pack, "字限": 75}
+            answer = build_benchmark(pack, align, {}, [], work, call=Mock(side_effect=[plan, document, {"正文": document["候选A"], "补写": [], "复核说明": "已覆盖"}]))
             self.assertEqual(answer["格数"], 11)
             self.assertEqual(answer["排版估算"]["排版占行"], 3)
             with self.assertRaisesRegex(ValueError, "答题区域仅20格"):
                 build_benchmark(pack, align, {}, [], work, sheet=(10, 2), call=Mock(side_effect=[plan, document, document, document]))
+
+
+    def test_reference_body_extraction_is_after_holdout_isolation(self):
+        held = {"原编号": -1, "来源": "甲老师", "正文": "甲独有的留出正文，它不能提供给制作端。" * 4}
+        unrelated = ["①提供就业服务。", "②受理劳动争议。", "③开展技能培训。"]
+        bundle = {"题干与要求": "概括主要做法", "参考答案": [
+            {"来源": "机构甲老师", "正文": held["正文"]},
+            {"来源": "转载者", "正文": "说明文字" * 30 + held["正文"]},
+            *[{"来源": str(i), "正文": "答题讲解：" + "分析" * 90 + "\n" + body}
+              for i, body in enumerate(unrelated)],
+        ]}
+
+        def prepare(_name, _prompt, payload, validate):
+            self.assertNotIn(held["正文"], str(payload))
+            picked = {"提取": [{"原编号": k, "原文片段": [v.splitlines()[-1]], "说明": "剔除讲解"}
+                                for k, v in payload["投稿"].items()]}
+            validate(picked)
+            picked["提取"][0]["原文片段"] = ["自行改写"]
+            with self.assertRaisesRegex(ValueError, "无法按原顺序定位"):
+                validate(picked)
+            picked["提取"][0]["原文片段"] = [unrelated[0]]
+            return picked
+
+        training, holdout, excluded = select_build_and_holdout(bundle, 25, external_holdout=[held], prepare=prepare)
+        self.assertEqual([row["正文"] for row in training], unrelated)
+        self.assertTrue(all(row["投稿格数"] > 25 >= row["格数"] for row in training))
+        self.assertEqual(holdout, [held])
+        self.assertEqual([row["原编号"] for row in excluded], [0, 1])
 
 
 if __name__ == "__main__":
