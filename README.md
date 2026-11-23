@@ -62,6 +62,8 @@
 
 ### 4. 对照评测
 
+热门小题可以用 `python -m scoring.class_a_pipeline "题目路径" --weighted --exclude-sources "留出来源甲" "留出来源乙" --output "实验结果.json"` 制作冻结细则和标杆，再匿名评阅留出稿。加 `--preparation-model gpt-6.2-sol` 时，制作端读取 `SHENLUN_MDKJ_RESPONSES_API_KEY` 使用 Responses 接口，批改仍由原 DeepSeek 中转处理。结果记录建表稿、留出稿、细则、标杆和逐项评分。普通小题的标杆连续书写，选定稿以有效字数的九成为下限。公文按必要格式换行，字限与排版分开核算。掌握答题区规格时，可对单题追加 `--answer-sheet 每行格数 区域行数`。
+
 当前批改读取工作区 `.env` 或进程环境中的 `SHENLUN_CHYYDS_API_KEY`，使用 `chyyds.com` 的 `deepseek-v4.1-flash`。未配置该项时使用 `DEEPSEEK_API_KEY` 直连。正式基线固定使用直连，细则缓存按模型和线路分别保存。
 
 评测集按整套试卷划分。生成变体使用 `python -m eval.generate_variants --split dev`，先独立核验变体，再执行基线。正式开发集命令如下。同一运行名接续已有断点。

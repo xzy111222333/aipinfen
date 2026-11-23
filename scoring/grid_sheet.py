@@ -25,6 +25,20 @@ def count_pure_exam_chars(text):
     return total
 
 
+def measure_benchmark_layout(text, row_width):
+    """按显式段落和行首空格估算到最后一个文字为止的布局占格。"""
+    used = 0
+    for line in text.strip("\r\n").splitlines():
+        if used % row_width:
+            used += row_width - used % row_width
+        content = line.lstrip(" \u3000")
+        if not content.strip():
+            used += row_width
+        else:
+            used += len(line) - len(content) + count_pure_exam_chars(content)
+    return used
+
+
 def detect_answer_completeness(text, expected_min_chars=None):
     """识别答卷属于正常成文作答，还是考后回忆提纲/含未展开占位符的残卷。"""
     raw = (text or "").strip()

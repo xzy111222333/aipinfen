@@ -43,9 +43,13 @@ def _resolve_api_key(api_key=None):
 
 
 JIJI_URL = "https://www.jiji.cc/v1/responses"
+MDKJ_URL = "https://mdkj.lol/v1/chat/completions"
+MDKJ_KEY = "SHENLUN_MDKJ_API_KEY"
 
 
 def llm_cache_model(api_key=None):
+    if api_key is None and _read_api_setting(MDKJ_KEY):
+        return MDKJ_URL, RELAY_MODEL
     if api_key is None and _read_api_setting("SHENLUN_JIJI_API_KEY"):
         return JIJI_URL, RELAY_MODEL
     return (RELAY_URL, RELAY_MODEL) if api_key is None and _read_api_setting(RELAY_KEY) else MODEL_DEFAULT
@@ -65,11 +69,12 @@ def _read_relay_response(response):
     raise ConnectionError("Response stream ended before completion")
 
 
-def call_llm_json(system_prompt, user_payload, api_key=None, model=None, temperature=0.0, max_tokens=12000):
+def call_llm_json(system_prompt, user_payload, api_key=None, model=None, temperature=0.0, max_tokens=16000):
+    mdkj_key = _read_api_setting(MDKJ_KEY) if api_key is None else None
     relay_key = _read_api_setting(RELAY_KEY) if api_key is None else None
-    jiji_key = _read_api_setting("SHENLUN_JIJI_API_KEY") if api_key is None else None
-    url = JIJI_URL if jiji_key else RELAY_URL if relay_key else API_URL
-    relay_key = jiji_key or relay_key
+    jiji_key = (None if mdkj_key else _read_api_setting("SHENLUN_JIJI_API_KEY")) if api_key is None else None
+    url = MDKJ_URL if mdkj_key else JIJI_URL if jiji_key else RELAY_URL if relay_key else API_URL
+    relay_key = mdkj_key or jiji_key or relay_key
     key = relay_key or _resolve_api_key(api_key)
     model = model or (RELAY_MODEL if relay_key else MODEL_DEFAULT)
     headers = {"Content-Type": "application/json"}
@@ -116,6 +121,9 @@ def call_llm_json(system_prompt, user_payload, api_key=None, model=None, tempera
             content = choice["message"].get("content")
             if not isinstance(content, str) or not content.strip():
                 raise ValueError("模型响应缺少有效正文")
+            content = content.strip()
+            if content.startswith("```"):
+                content = re.sub(r"^```(?:json)?\s*|\s*```$", "", content, flags=re.I).strip()
             # 清理偶发的尾随逗号容错后再做严格 json.loads
             cleaned_json = re.sub(r",\s*([}\]])", r"\1", content)
             return json.loads(cleaned_json)
